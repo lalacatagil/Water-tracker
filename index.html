@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Water Tracker Gatito</title>
+
+<style>
+body {
+    background: #e6f4ff;
+    font-family: "Arial Rounded MT Bold", Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    color: #1e40af;
+}
+
+h1 { margin-bottom: 6px; }
+
+/* CONTENEDOR */
+.drop-container {
+    width: 180px;
+    height: 260px;
+    position: relative;
+    margin: 20px 0;
+}
+
+/* OREJAS */
+.ear {
+    position: absolute;
+    top: -26px;
+    width: 36px;
+    height: 42px;
+    background: #dbeeff;
+    border: 3px solid #1e40af;
+    border-bottom: none;
+    border-radius: 60% 60% 40% 40%;
+    transform: rotate(0deg);
+    z-index: 3;
+}
+
+.ear.left {
+    left: 34px;
+    transform: rotate(-12deg);
+}
+
+.ear.right {
+    right: 34px;
+    transform: rotate(12deg);
+}
+
+/* GOTA */
+.drop {
+    width: 100%;
+    height: 100%;
+    background: #dbeeff;
+    border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid #1e40af;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* AGUA */
+.water {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to top, #4fc3f7, #b3e5fc);
+    transition: height 0.6s ease;
+    overflow: hidden;
+}
+
+/* OLAS */
+.wave {
+    position: absolute;
+    top: -24px;
+    width: 220%;
+    height: 50px;
+    background: rgba(255,255,255,0.45);
+    border-radius: 45%;
+    animation: waveMove 3s linear infinite;
+}
+
+.wave:nth-child(2) {
+    top: -34px;
+    opacity: 0.35;
+    animation-duration: 4.5s;
+}
+
+@keyframes waveMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* CARA */
+.face {
+    position: absolute;
+    top: 55%;
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
+}
+
+.eye {
+    display: inline-block;
+    width: 14px;
+    height: 7px;
+    border-bottom: 3px solid #1e40af;
+    border-radius: 0 0 20px 20px;
+    margin: 0 10px;
+}
+
+.nose {
+    width: 8px;
+    height: 6px;
+    background: #1e40af;
+    border-radius: 50%;
+    margin: 4px auto;
+}
+
+.whiskers {
+    position: relative;
+    width: 100%;
+    height: 14px;
+}
+
+.whisker {
+    position: absolute;
+    width: 32px;
+    height: 2px;
+    background: #1e40af;
+}
+
+.whisker.left1 { left: 22px; top: 3px; }
+.whisker.left2 { left: 22px; top: 10px; }
+.whisker.right1 { right: 22px; top: 3px; }
+.whisker.right2 { right: 22px; top: 10px; }
+
+/* CONTADOR */
+.counter {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.counter button {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid #1e40af;
+    font-size: 24px;
+    background: #cfe9ff;
+    color: #1e40af;
+    cursor: pointer;
+}
+
+.counter-value {
+    font-size: 34px;
+    font-weight: bold;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* INFO */
+.info {
+    margin-top: 8px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* ANIMACIONES */
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+</style>
+</head>
+
+<body>
+
+<h1>💧 Water Tracker</h1>
+
+<div class="drop-container">
+    <div class="ear left"></div>
+    <div class="ear right"></div>
+
+    <div class="drop">
+        <div class="water" id="water">
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+
+        <div class="face">
+            <div>
+                <span class="eye"></span>
+                <span class="eye"></span>
+            </div>
+            <div class="nose"></div>
+            <div class="whiskers">
+                <div class="whisker left1"></div>
+                <div class="whisker left2"></div>
+                <div class="whisker right1"></div>
+                <div class="whisker right2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="counter">
+    <button onclick="changeGlasses(-1)">−</button>
+    <div class="counter-value" id="glassCount">0</div>
+    <button onclick="changeGlasses(1)">+</button>
+</div>
+
+<div class="info" id="info">
+0 / 8 vasos<br>
+💧 0 ml / 2000 ml
+</div>
+
+<script>
+let glasses = 0;
+const maxGlasses = 8;
+const totalGoalMl = 2000;
+const mlPerGlass = totalGoalMl / maxGlasses;
+
+const water = document.getElementById("water");
+const glassCount = document.getElementById("glassCount");
+const info = document.getElementById("info");
+
+function changeGlasses(amount) {
+    glasses += amount;
+    if (glasses < 0) glasses = 0;
+    if (glasses > maxGlasses) glasses = maxGlasses;
+
+    const percentage = (glasses / maxGlasses) * 100;
+    const totalMl = Math.round(glasses * mlPerGlass);
+
+    water.style.height = percentage + "%";
+    glassCount.textContent = glasses;
+    info.innerHTML = `
+        ${glasses} / ${maxGlasses} vasos<br>
+        💧 ${totalMl} ml / ${totalGoalMl} ml
+    `;
+}
+</script>
+
+</body>
+</html>
